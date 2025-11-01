@@ -1,22 +1,25 @@
-const express = require("express");
-const cors = require("cors");
-const dotenv = require("dotenv");
+import express from "express";
+import cors from "cors";
+import dotenv from "dotenv";
+//import mongoose from "mongoose";
+import authRoutes from "./routes/authRoutes.js";
+//import User from "./models/User.js";
+
+import connectDB from "./config/db.js";
+//const testRoutes = require("./routes/testRoutes");
+//const Advisory = require("./models/Advisory");
 const app = express();
-const connectDB = require("./config/db");
-const testRoutes = require("./routes/testRoutes");
-const Advisory = require("./models/Advisory");
-const User = require("./models/User");
 dotenv.config();
 connectDB();
 app.use(cors());
 app.use(express.json());
-app.use("/api/test/", testRoutes);
+//app.use("/api/test/", testRoutes);
 
 app.get("/", (req, res) => {
   res.send("Healthlink API is running...");
 });
-
-app.get("/api/test-models", async (req, res) => {
+app.use("/api/auth", authRoutes);
+/*app.get("/api/test-models", async (req, res) => {
   const user = await User.create({
     name: "Test User",
     email: "test@user.com",
@@ -32,6 +35,6 @@ app.get("/api/test-models", async (req, res) => {
 
   res.json({ user, advisory });
 });
-
+*/
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`server is running on port ${PORT}`));
