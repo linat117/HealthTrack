@@ -1,14 +1,23 @@
 import { useState } from "react";
 import { TextField, Button, Box, Typography, Paper } from "@mui/material";
-
+import API from "../api/api.js";
 const Login = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [form, setForm] = useState({ email: "", password: "" });
+  const [message, setMessage] = useState("");
 
-  const handleLogin = (e) => {
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Login data:", { email, password });
-    // Later: Send to backend
+    try {
+      const { data } = await API.post("/auth/login", form);
+      localStorage.setItem("token", data.token);
+      setMessage(`Welcome back, ${data.user.name}!`);
+    } catch (err) {
+      setMessage(err.response?.data?.msg || "Login failed");
+    }
   };
 
   return (
@@ -27,20 +36,23 @@ const Login = () => {
         >
           Login to HealthLink
         </Typography>
-        <form onSubmit={handleLogin}>
+        <form onSubmit={handleSubmit}>
           <TextField
+            name="email"
+            type="email"
             label="Email"
             fullWidth
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            value={form.email}
+            onChange={handleChange}
             margin="normal"
           />
           <TextField
+            name="password"
             label="Password"
             type="password"
             fullWidth
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            value={form.password}
+            onChange={handleChange}
             margin="normal"
           />
           <Button
@@ -53,6 +65,7 @@ const Login = () => {
           </Button>
         </form>
       </Paper>
+      <p>{message}</p>
     </Box>
   );
 };

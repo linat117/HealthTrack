@@ -1,21 +1,26 @@
 import { useState } from "react";
 import { TextField, Button, Box, Typography, Paper } from "@mui/material";
-
+import API from "../api/api";
 const Register = () => {
   const [form, setForm] = useState({
     name: "",
     email: "",
     password: "",
   });
-
+  const [message, setMessage] = useState("");
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Register data:", form);
-    // Later: Send to backend
+    try {
+      const { data } = await API.post("/auth/register", form);
+      localStorage.setItem("token", data.token);
+      setMessage(`Welcome, ${data.user.name}!`);
+    } catch (err) {
+      setMessage(err.response?.data?.msg || "Registration failed");
+    }
   };
 
   return (
@@ -66,6 +71,7 @@ const Register = () => {
             Register
           </Button>
         </form>
+        <p>{message}</p>
       </Paper>
     </Box>
   );
