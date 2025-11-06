@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-
+import Advisories from "../components/Advisories";
 export default function Dashboard() {
   const navigate = useNavigate();
   const [user, setUser] = useState(localStorage.getItem("token"));
@@ -15,6 +15,7 @@ export default function Dashboard() {
       <h2>Dashboard</h2>
       <p>Welcome! You are logged in.</p>
       <button onClick={handleLogout}>Logout</button>
+      <Advisories />
     </div>
   );
 }

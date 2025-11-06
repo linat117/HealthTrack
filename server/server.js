@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 //import mongoose from "mongoose";
 import authRoutes from "./routes/authRoutes.js";
 //import User from "./models/User.js";
-
+import advisoryRoutes from "./routes/advisoryRoutes.js";
 import connectDB from "./config/db.js";
 //const testRoutes = require("./routes/testRoutes");
 //const Advisory = require("./models/Advisory");
@@ -19,6 +19,7 @@ app.get("/", (req, res) => {
   res.send("Healthlink API is running...");
 });
 app.use("/api/auth", authRoutes);
+app.use("/api/advisories", advisoryRoutes);
 /*app.get("/api/test-models", async (req, res) => {
   const user = await User.create({
     name: "Test User",
