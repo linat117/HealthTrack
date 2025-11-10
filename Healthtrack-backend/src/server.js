@@ -4,17 +4,21 @@ import connectDB from "./utils/db.js";
 import authRoutes from "./routes/authRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import managerRoutes from "./routes/managerRoutes.js";
+import expertRoutes from "./routes/expertRoutes.js";
+import userRoutes from "./routes/userRoutes.js";
 dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
 // middleware
 app.use(express.json());
-
+app.use(express.urlencoded({ extended: true }));
 // routes
 app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/manager", managerRoutes);
+app.use("/api/expert", expertRoutes);
+app.use("/api/users", userRoutes);
 // connect db
 connectDB();
 

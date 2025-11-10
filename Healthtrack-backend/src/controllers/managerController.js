@@ -1,20 +1,24 @@
 import User from "../models/User.js";
 import bcrypt from "bcryptjs";
 
-// Manager creates an expert
 export const createExpert = async (req, res) => {
   try {
-    const { name, email, tempPassword } = req.body;
+    console.log("Request body:", req.body); // debug
 
+    const { name, email, tempPassword } = req.body;
     if (!name || !email || !tempPassword) {
-      return res.status(400).json({ message: "All fields are required" });
+      return res
+        .status(400)
+        .json({ message: "All fields required", body: req.body });
     }
 
     const existingUser = await User.findOne({ email });
-    if (existingUser)
+    if (existingUser) {
       return res.status(400).json({ message: "User already exists" });
+    }
 
     const hashedPassword = await bcrypt.hash(tempPassword, 10);
+    console.log("Hashed password:", hashedPassword); // debug
 
     const expert = new User({
       name,
@@ -22,15 +26,14 @@ export const createExpert = async (req, res) => {
       role: "expert",
       password: hashedPassword,
       mustChangePassword: true,
-      createdBy: req.user.id, // manager ID
+      createdBy: req.user.id,
     });
 
     await expert.save();
-
     res.status(201).json({ expert });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: err.message });
+    res.status(500).json({ message: "Server error", error: err.message });
   }
 };
 
