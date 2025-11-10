@@ -10,6 +10,8 @@ const userSchema = new mongoose.Schema(
       enum: ["admin", "manager", "expert", "user"],
       default: "user",
     },
+    mustChangePassword: { type: Boolean, default: false },
+    createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   },
   { timestamps: true }
 );
