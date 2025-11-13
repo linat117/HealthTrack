@@ -1,4 +1,4 @@
-import Post from "../models/Post.js";
+import Post from "../models/Advisory.js";
 import Category from "../models/Category.js";
 
 // Expert creates a post

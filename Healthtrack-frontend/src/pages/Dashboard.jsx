@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 const Dashboard = () => {
-  const { user, logout } = useContext(AuthContext);
+  const { user, token, logout } = useContext(AuthContext);
   const navigate = useNavigate();
   const [entries, setEntries] = useState([]);
 
@@ -20,7 +20,7 @@ const Dashboard = () => {
   const fetchHealthData = async () => {
     try {
       const res = await axios.get("http://localhost:5000/api/health/user", {
-        headers: { Authorization: `Bearer ${user}` },
+        headers: { Authorization: `Bearer ${token}` },
       });
       setEntries(res.data);
     } catch (err) {
@@ -34,7 +34,7 @@ const Dashboard = () => {
         "http://localhost:5000/api/health/add",
         data,
         {
-          headers: { Authorization: `Bearer ${user}` },
+          headers: { Authorization: `Bearer ${token}` },
         }
       );
       setEntries([...entries, res.data]);

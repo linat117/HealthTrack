@@ -19,6 +19,7 @@ const Register = () => {
     e.preventDefault();
     try {
       await registerUser(formData);
+      console.log("User registered successfully!");
       navigate("/login");
     } catch (err) {
       setError(err.response?.data?.message || "Something went wrong");

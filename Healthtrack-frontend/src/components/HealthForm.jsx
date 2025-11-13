@@ -1,12 +1,15 @@
+// src/components/HealthForm.jsx
 import React, { useState } from "react";
-import "bootstrap/dist/css/bootstrap.min.css";
 
 const HealthForm = ({ onAdd }) => {
   const [formData, setFormData] = useState({
-    mood: "",
+    weight: "",
+    bloodPressure: "",
     steps: "",
-    waterIntake: "",
+    notes: "",
   });
+
+  const [error, setError] = useState("");
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -14,45 +17,82 @@ const HealthForm = ({ onAdd }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onAdd(formData);
-    setFormData({ mood: "", steps: "", waterIntake: "" });
+
+    // Basic validation
+    if (!formData.weight) {
+      setError("Weight is required");
+      return;
+    }
+
+    // Convert numbers properly
+    const dataToSend = {
+      weight: parseFloat(formData.weight),
+      bloodPressure: formData.bloodPressure || "",
+      steps: formData.steps ? parseInt(formData.steps) : undefined,
+      notes: formData.notes || "",
+    };
+
+    onAdd(dataToSend);
+
+    // Clear form
+    setFormData({
+      weight: "",
+      bloodPressure: "",
+      steps: "",
+      notes: "",
+    });
+    setError("");
   };
 
   return (
     <form onSubmit={handleSubmit}>
+      {error && <div className="alert alert-danger">{error}</div>}
+
       <div className="mb-3">
-        <label>Mood</label>
+        <label className="form-label">Weight (kg)</label>
         <input
-          type="text"
-          name="mood"
+          type="number"
+          name="weight"
           className="form-control"
-          value={formData.mood}
+          value={formData.weight}
           onChange={handleChange}
           required
         />
       </div>
+
       <div className="mb-3">
-        <label>Steps</label>
+        <label className="form-label">Blood Pressure</label>
+        <input
+          type="text"
+          name="bloodPressure"
+          className="form-control"
+          value={formData.bloodPressure}
+          onChange={handleChange}
+          placeholder="e.g., 120/80"
+        />
+      </div>
+
+      <div className="mb-3">
+        <label className="form-label">Steps</label>
         <input
           type="number"
           name="steps"
           className="form-control"
           value={formData.steps}
           onChange={handleChange}
-          required
         />
       </div>
+
       <div className="mb-3">
-        <label>Water Intake (L)</label>
-        <input
-          type="number"
-          name="waterIntake"
+        <label className="form-label">Notes</label>
+        <textarea
+          name="notes"
           className="form-control"
-          value={formData.waterIntake}
+          value={formData.notes}
           onChange={handleChange}
-          required
-        />
+        ></textarea>
       </div>
+
       <button type="submit" className="btn btn-primary w-100">
         Add Entry
       </button>

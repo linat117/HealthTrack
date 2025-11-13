@@ -6,6 +6,8 @@ import adminRoutes from "./routes/adminRoutes.js";
 import managerRoutes from "./routes/managerRoutes.js";
 import expertRoutes from "./routes/expertRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
+import advisoryRoutes from "./routes/advisory.js";
+import healthRoutes from "./routes/healthRoutes.js";
 import cors from "cors";
 dotenv.config();
 const app = express();
@@ -22,11 +24,14 @@ app.use(
   })
 );
 // routes
+
+app.use("/api/health", healthRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/manager", managerRoutes);
 app.use("/api/expert", expertRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/advisory", advisoryRoutes);
 // connect db
 connectDB();
 

@@ -30,6 +30,13 @@ const Header = () => {
         </button>
         <div className="collapse navbar-collapse" id="navbarNav">
           <ul className="navbar-nav ms-auto">
+            {/* Home link is always visible */}
+            <li className="nav-item">
+              <Link className="nav-link text-black" to="/">
+                Home
+              </Link>
+            </li>
+
             {!user ? (
               <>
                 <li className="nav-item">

@@ -16,7 +16,8 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await login(formData.email, formData.password);
+      await login(formData);
+      console.log("user logged in successfully!");
       navigate("/dashboard");
     } catch (err) {
       setError("Invalid credentials. Please try again.");
