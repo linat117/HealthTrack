@@ -1,0 +1,57 @@
+/* src/index.css */
+
+/* Theme colors */
+:root {
+  --primary-blue: #3b82f6;
+  --light-gray: #f5f5f5;
+  --brown-white: #faf5f0;
+  --accent: #fcd34d;
+  --text-black: #0b0b0b;
+}
+
+/* Basic body */
+body {
+  background-color: var(--brown-white);
+  color: var(--text-black);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Card styles used across the app */
+.card {
+  border-radius: 12px;
+}
+
+.navbar .navbar-brand {
+  font-weight: 700;
+  color: var(--text-black) !important;
+}
+
+/* Buttons */
+.btn-primary {
+  background-color: var(--primary-blue);
+  border-color: var(--primary-blue);
+}
+.btn-primary:hover {
+  background-color: #2b6fd6;
+  border-color: #2b6fd6;
+}
+
+.btn-outline-primary {
+  color: var(--primary-blue);
+  border-color: var(--primary-blue);
+}
+
+/* Post card specific */
+.post-card {
+  background-color: var(--brown-white);
+  border: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+/* Small responsiveness helpers */
+@media (max-width: 576px) {
+  .container {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+}
