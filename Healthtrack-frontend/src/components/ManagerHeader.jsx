@@ -54,13 +54,8 @@ const ManagerHeader = () => {
               </Link>
             </li>
             <li className="nav-item">
-              <Link className="nav-link" to="/manager/categories/add">
-                Add Category
-              </Link>
-            </li>
-            <li className="nav-item">
-              <Link className="nav-link" to="/manager/categories">
-                Manage Categories
+              <Link className="nav-link" to="/manager/posts">
+                Posts
               </Link>
             </li>
             {user && (

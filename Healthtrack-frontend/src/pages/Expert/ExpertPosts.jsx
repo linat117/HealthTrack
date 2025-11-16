@@ -1,23 +1,21 @@
 import React, { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../context/AuthContext.jsx";
-import { managerMyPosts, managerDeletePost, managerUpdatePost, reactToPost, commentOnPost, getCategories, managerUploadImage } from "../../api/api.js";
+import { expertMyPosts, expertDeletePost, expertUpdatePost, getCategories, managerUploadImage } from "../../api/api.js";
 
-const ManagerPosts = () => {
+const ExpertPosts = () => {
   const { token } = useContext(AuthContext);
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState(null);
   const [editForm, setEditForm] = useState({ title: "", content: "", categoryId: "", imageUrl: "" });
-  const [commentMap, setCommentMap] = useState({});
   const [categories, setCategories] = useState([]);
   const [fileMap, setFileMap] = useState({});
-  const [showReactModal, setShowReactModal] = useState(false);
   const [showCommentsModal, setShowCommentsModal] = useState(false);
   const [activePost, setActivePost] = useState(null);
 
   const load = async () => {
     setLoading(true);
-    const data = await managerMyPosts(token);
+    const data = await expertMyPosts(token);
     setPosts(data.posts || []);
     setLoading(false);
   };
@@ -42,24 +40,13 @@ const ManagerPosts = () => {
       const up = await managerUploadImage(file, token);
       payload.imageUrl = up.url;
     }
-    await managerUpdatePost(id, payload, token);
+    await expertUpdatePost(id, payload, token);
     setEditingId(null);
     load();
   };
   const doDelete = async (id) => {
     if (!window.confirm("Delete this post?")) return;
-    await managerDeletePost(id, token);
-    load();
-  };
-  const react = async (id, type) => {
-    await reactToPost(id, type, token);
-    load();
-  };
-  const sendComment = async (id) => {
-    const comment = commentMap[id];
-    if (!comment) return;
-    await commentOnPost(id, comment, token);
-    setCommentMap({ ...commentMap, [id]: "" });
+    await expertDeletePost(id, token);
     load();
   };
 
@@ -90,54 +77,6 @@ const ManagerPosts = () => {
                   p.title
                 )}
               </td>
-              <td style={{ minWidth: 120 }}>
-                <button
-                  className="btn btn-sm btn-outline-primary"
-                  onClick={() => {
-                    setActivePost(p);
-                    setShowReactModal(true);
-                  }}
-                >
-                  {(p.reactions || []).length} reactions
-                </button>
-              </td>
-              <td style={{ minWidth: 120 }}>
-                <button
-                  className="btn btn-sm btn-outline-secondary"
-                  onClick={() => {
-                    setActivePost(p);
-                    setShowCommentsModal(true);
-                  }}
-                >
-                  {(p.comments || []).length} comments
-                </button>
-              </td>
-              <td style={{ minWidth: 200 }}>
-                {editingId === p._id ? (
-                  <input
-                    className="form-control form-control-sm"
-                    placeholder="https://..."
-                    value={editForm.imageUrl}
-                    onChange={(e) => setEditForm({ ...editForm, imageUrl: e.target.value })}
-                  />
-                ) : p.imageUrl ? (
-                  <img
-                    src={/^https?:\/\//i.test(p.imageUrl) ? p.imageUrl : `http://localhost:5000${p.imageUrl.startsWith("/") ? p.imageUrl : `/${p.imageUrl}`}`}
-                    alt=""
-                    style={{ maxWidth: 180, maxHeight: 100, objectFit: "cover", borderRadius: 6 }}
-                  />
-                ) : (
-                  <span className="text-muted">-</span>
-                )}
-                {editingId === p._id && (
-                  <input
-                    type="file"
-                    accept="image/*"
-                    className="form-control form-control-sm mt-2"
-                    onChange={(e) => setFileMap({ ...fileMap, [p._id]: e.target.files?.[0] || null })}
-                  />
-                )}
-              </td>
               <td style={{ maxWidth: 400 }}>
                 {editingId === p._id ? (
                   <textarea className="form-control" rows="2" value={editForm.content} onChange={(e) => setEditForm({ ...editForm, content: e.target.value })} />
@@ -161,6 +100,40 @@ const ManagerPosts = () => {
                   p.category?.name || "-"
                 )}
               </td>
+              <td>{(p.reactions || []).length}</td>
+              <td>
+                <button
+                  className="btn btn-sm btn-outline-secondary"
+                  onClick={() => {
+                    setActivePost(p);
+                    setShowCommentsModal(true);
+                  }}
+                >
+                  {(p.comments || []).length} comments
+                </button>
+              </td>
+              <td style={{ minWidth: 200 }}>
+                {editingId === p._id ? (
+                  <>
+                    <input
+                      className="form-control form-control-sm"
+                      placeholder="https://..."
+                      value={editForm.imageUrl}
+                      onChange={(e) => setEditForm({ ...editForm, imageUrl: e.target.value })}
+                    />
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="form-control form-control-sm mt-2"
+                      onChange={(e) => setFileMap({ ...fileMap, [p._id]: e.target.files?.[0] || null })}
+                    />
+                  </>
+                ) : p.imageUrl ? (
+                  <img src={p.imageUrl} alt="" style={{ maxWidth: 180, maxHeight: 100, objectFit: "cover", borderRadius: 6 }} />
+                ) : (
+                  <span className="text-muted">-</span>
+                )}
+              </td>
               <td className="d-flex flex-column flex-md-row gap-2">
                 {editingId === p._id ? (
                   <>
@@ -169,9 +142,7 @@ const ManagerPosts = () => {
                   </>
                 ) : (
                   <>
-                    <button className="btn btn-sm btn-outline-secondary" onClick={() => { setActivePost(p); setShowCommentsModal(true); }}>
-                      View
-                    </button>
+                    <button className="btn btn-sm btn-outline-secondary" onClick={() => { setActivePost(p); setShowCommentsModal(true); }}>View</button>
                     <button className="btn btn-sm btn-outline-secondary" onClick={() => startEdit(p)}>Edit</button>
                     <button className="btn btn-sm btn-danger" onClick={() => doDelete(p._id)}>Delete</button>
                   </>
@@ -181,39 +152,7 @@ const ManagerPosts = () => {
           ))}
         </tbody>
       </table>
-      {/* Reactions breakdown modal */}
-      {showReactModal && activePost && (
-        <div className="modal d-block" tabIndex="-1" role="dialog" onClick={() => setShowReactModal(false)}>
-          <div className="modal-dialog" role="document" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-content">
-              <div className="modal-header">
-                <h5 className="modal-title">Reactions</h5>
-                <button type="button" className="btn-close" onClick={() => setShowReactModal(false)}></button>
-              </div>
-              <div className="modal-body">
-                {(() => {
-                  const counts = { like: 0, love: 0, haha: 0, sad: 0 };
-                  (activePost.reactions || []).forEach((r) => {
-                    if (counts[r.type] !== undefined) counts[r.type] += 1;
-                  });
-                  return (
-                    <ul className="list-group">
-                      <li className="list-group-item d-flex justify-content-between"><span>👍 Like</span><span className="badge text-bg-primary">{counts.like}</span></li>
-                      <li className="list-group-item d-flex justify-content-between"><span>❤️ Love</span><span className="badge text-bg-primary">{counts.love}</span></li>
-                      <li className="list-group-item d-flex justify-content-between"><span>😄 Haha</span><span className="badge text-bg-primary">{counts.haha}</span></li>
-                      <li className="list-group-item d-flex justify-content-between"><span>😢 Sad</span><span className="badge text-bg-primary">{counts.sad}</span></li>
-                    </ul>
-                  );
-                })()}
-              </div>
-              <div className="modal-footer">
-                <button type="button" className="btn btn-secondary" onClick={() => setShowReactModal(false)}>Close</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-      {/* Comments list modal */}
+      {/* Comments modal (read-only) */}
       {showCommentsModal && activePost && (
         <div className="modal d-block" tabIndex="-1" role="dialog" onClick={() => setShowCommentsModal(false)}>
           <div className="modal-dialog modal-lg" role="document" onClick={(e) => e.stopPropagation()}>
@@ -248,6 +187,6 @@ const ManagerPosts = () => {
   );
 };
 
-export default ManagerPosts;
+export default ExpertPosts;
 
 

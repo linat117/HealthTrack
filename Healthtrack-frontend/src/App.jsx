@@ -8,6 +8,7 @@ import PrivateRoute from "./routes/PrivateRoute.jsx";
 import Header from "./components/Header.jsx";
 import AdminHeader from "./components/AdminHeader.jsx";
 import ManagerHeader from "./components/ManagerHeader.jsx";
+import ExpertHeader from "./components/ExpertHeader.jsx";
 import Footer from "./components/Footer.jsx";
 import AdminDashboard from "./pages/Admin/AdminDashboard.jsx";
 import ManagersList from "./pages/Admin/ManagerList.jsx";
@@ -20,8 +21,10 @@ import ManagerAddPost from "./pages/Manager/ManagerAddPost.jsx";
 import ManagerMyPosts from "./pages/Manager/ManagerPosts.jsx";
 import ManagerAddExpert from "./pages/Manager/ManagerAddExpert.jsx";
 import ManagerExperts from "./pages/Manager/ManagerExperts.jsx";
-import ManagerAddCategory from "./pages/Manager/ManagerAddCategory.jsx";
-import ManagerCategories from "./pages/Manager/ManagerCategories.jsx";
+// Manager category pages removed (admin-only categories now)
+import ExpertAddPost from "./pages/Expert/ExpertAddPost.jsx";
+import ExpertPosts from "./pages/Expert/ExpertPosts.jsx";
+import AdminCategories from "./pages/Admin/AdminCategories.jsx";
 import { AuthContext } from "./context/AuthContext.jsx";
 import ChangePassword from "./pages/ChangePassword.jsx";
 
@@ -29,9 +32,10 @@ const AppShell = () => {
   const { user } = useContext(AuthContext);
   const isAdminSection = user?.role === "admin";
   const isManagerSection = user?.role === "manager";
+  const isExpertSection = user?.role === "expert";
   return (
     <>
-      {isAdminSection ? <AdminHeader /> : isManagerSection ? <ManagerHeader /> : <Header />}
+      {isAdminSection ? <AdminHeader /> : isManagerSection ? <ManagerHeader /> : isExpertSection ? <ExpertHeader /> : <Header />}
       <div className="container my-4">
         <Routes>
           <Route path="/" element={<Home />} />
@@ -74,6 +78,14 @@ const AppShell = () => {
             element={
               <PrivateRoute>
                 <CreateAdmin />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/admin/categories"
+            element={
+              <PrivateRoute>
+                <AdminCategories />
               </PrivateRoute>
             }
           />
@@ -142,19 +154,21 @@ const AppShell = () => {
               </PrivateRoute>
             }
           />
+          {/* Manager category routes removed: categories are admin-only */}
+          {/* Expert routes */}
           <Route
-            path="/manager/categories/add"
+            path="/expert/posts/add"
             element={
               <PrivateRoute>
-                <ManagerAddCategory />
+                <ExpertAddPost />
               </PrivateRoute>
             }
           />
           <Route
-            path="/manager/categories"
+            path="/expert/posts"
             element={
               <PrivateRoute>
-                <ManagerCategories />
+                <ExpertPosts />
               </PrivateRoute>
             }
           />

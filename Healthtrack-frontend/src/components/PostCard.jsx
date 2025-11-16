@@ -5,6 +5,12 @@ import { reactToPost, commentOnPost, replyToComment } from "../api/api.js";
 const PostCard = ({ post, onUpdated }) => {
   const { token } = useContext(AuthContext);
   const [comment, setComment] = useState("");
+  const resolveImageUrl = (url) => {
+    if (!url) return "";
+    if (/^https?:\/\//i.test(url)) return url;
+    const backend = "http://localhost:5000";
+    return `${backend}${url.startsWith("/") ? url : `/${url}`}`;
+  };
   const counts = useMemo(() => {
     const byType = { like: 0, love: 0, haha: 0, sad: 0 };
     (post.reactions || []).forEach((r) => {
@@ -34,15 +40,22 @@ const PostCard = ({ post, onUpdated }) => {
     <div className="card mb-3 shadow-sm border-0">
       {post.imageUrl && (
         <img
-          src={post.imageUrl}
+          src={resolveImageUrl(post.imageUrl)}
           alt=""
           className="card-img-top"
           style={{ maxHeight: 240, objectFit: "cover" }}
         />
       )}
       <div className="card-body">
-        <h5 className="card-title">{post.title}</h5>
-        <p className="card-text">{post.content}</p>
+        <div className="d-flex justify-content-between align-items-start">
+          <h5 className="card-title mb-1">{post.title}</h5>
+          {post.category?.name && (
+            <span className="badge text-bg-light border">{post.category.name}</span>
+          )}
+        </div>
+        <p className="card-text text-muted mb-2" style={{ whiteSpace: "pre-line" }}>
+          {post.content?.length > 220 ? `${post.content.slice(0, 220)}...` : post.content}
+        </p>
         <div className="d-flex flex-wrap gap-3 small text-muted">
           <span>
             Reactions: {counts.total} (👍 {counts.like} · ❤️ {counts.love} · 😄 {counts.haha} · 😢 {counts.sad})

@@ -7,6 +7,9 @@ import {
   reactToPost,
   commentOnPost,
   replyToComment,
+  myPosts,
+  updatePost,
+  deletePost,
 } from "../controllers/expertController.js";
 
 const router = express.Router();
@@ -14,6 +17,9 @@ const router = express.Router();
 // Expert routes
 router.post("/posts", authMiddleware, roleMiddleware("expert"), createPost);
 router.get("/posts", authMiddleware, getPosts);
+router.get("/posts/mine", authMiddleware, roleMiddleware("expert"), myPosts);
+router.put("/posts/:id", authMiddleware, roleMiddleware("expert"), updatePost);
+router.delete("/posts/:id", authMiddleware, roleMiddleware("expert"), deletePost);
 
 // User interactions
 router.post("/posts/:postId/react", authMiddleware, reactToPost);

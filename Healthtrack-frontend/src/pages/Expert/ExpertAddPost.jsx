@@ -1,8 +1,8 @@
 import React, { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../context/AuthContext.jsx";
-import { managerCreatePost, getCategories, managerUploadImage } from "../../api/api.js";
+import { expertCreatePost, getCategories, managerUploadImage } from "../../api/api.js";
 
-const ManagerAddPost = () => {
+const ExpertAddPost = () => {
   const { token } = useContext(AuthContext);
   const [form, setForm] = useState({ title: "", content: "", categoryId: "", imageUrl: "" });
   const [categories, setCategories] = useState([]);
@@ -11,8 +11,6 @@ const ManagerAddPost = () => {
   const [error, setError] = useState("");
   const [file, setFile] = useState(null);
 
-  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
-  const handleFile = (e) => setFile(e.target.files?.[0] || null);
   useEffect(() => {
     const load = async () => {
       const data = await getCategories();
@@ -21,7 +19,10 @@ const ManagerAddPost = () => {
     load();
   }, []);
 
-  const handleSubmit = async (e) => {
+  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+  const handleFile = (e) => setFile(e.target.files?.[0] || null);
+
+  const submit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError("");
@@ -32,7 +33,7 @@ const ManagerAddPost = () => {
         const up = await managerUploadImage(file, token);
         payload.imageUrl = up.url;
       }
-      await managerCreatePost(payload, token);
+      await expertCreatePost(payload, token);
       setSuccess("Post created.");
       setForm({ title: "", content: "", categoryId: "", imageUrl: "" });
       setFile(null);
@@ -52,7 +53,7 @@ const ManagerAddPost = () => {
               <h3 className="mb-3">Add Post</h3>
               {error && <div className="alert alert-danger">{error}</div>}
               {success && <div className="alert alert-success">{success}</div>}
-              <form onSubmit={handleSubmit}>
+              <form onSubmit={submit}>
                 <div className="mb-3">
                   <label className="form-label">Title</label>
                   <input name="title" className="form-control" value={form.title} onChange={handleChange} required />
@@ -63,13 +64,7 @@ const ManagerAddPost = () => {
                 </div>
                 <div className="mb-3">
                   <label className="form-label">Category</label>
-                  <select
-                    name="categoryId"
-                    className="form-select"
-                    value={form.categoryId}
-                    onChange={handleChange}
-                    required
-                  >
+                  <select name="categoryId" className="form-select" value={form.categoryId} onChange={handleChange} required>
                     <option value="">Select a category</option>
                     {categories.map((c) => (
                       <option key={c._id} value={c._id}>{c.name}</option>
@@ -96,6 +91,6 @@ const ManagerAddPost = () => {
   );
 };
 
-export default ManagerAddPost;
+export default ExpertAddPost;
 
 

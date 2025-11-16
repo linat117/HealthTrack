@@ -46,6 +46,18 @@ const AdminDashboard = () => {
             </div>
           </Link>
         </div>
+        <div className="col-12 col-md-6 col-lg-4">
+          <Link to="/admin/categories" className="text-decoration-none">
+            <div className="card h-100 shadow-sm">
+              <div className="card-body">
+                <h5 className="card-title mb-2">Categories</h5>
+                <p className="card-text text-muted mb-0">
+                  Create and manage global categories for posts.
+                </p>
+              </div>
+            </div>
+          </Link>
+        </div>
       </div>
     </div>
   );

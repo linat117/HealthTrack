@@ -8,6 +8,9 @@ import {
   updateManager,
   deleteManager,
   createAdminUser,
+  adminCreateCategory,
+  adminGetCategories,
+  adminDeleteCategory,
 } from "../controllers/adminController.js";
 
 const router = express.Router();
@@ -20,5 +23,10 @@ router.delete("/managers/:id", authMiddleware, adminOnly, deleteManager);
 
 // create another admin
 router.post("/admins", authMiddleware, adminOnly, createAdminUser);
+
+// categories (admin only create/delete; list for admin dashboard usage)
+router.post("/categories", authMiddleware, adminOnly, adminCreateCategory);
+router.get("/categories", authMiddleware, adminOnly, adminGetCategories);
+router.delete("/categories/:id", authMiddleware, adminOnly, adminDeleteCategory);
 
 export default router;

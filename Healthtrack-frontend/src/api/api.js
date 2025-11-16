@@ -135,6 +135,24 @@ export const replyToComment = async (postId, commentId, comment, token) => {
   const response = await API.post(`/expert/posts/${postId}/comments/${commentId}/reply`, { comment }, authHeader(token));
   return response.data;
 };
+
+// Expert own posts
+export const expertCreatePost = async (data, token) => {
+  const response = await API.post("/expert/posts", data, authHeader(token));
+  return response.data;
+};
+export const expertMyPosts = async (token) => {
+  const response = await API.get("/expert/posts/mine", authHeader(token));
+  return response.data;
+};
+export const expertUpdatePost = async (id, data, token) => {
+  const response = await API.put(`/expert/posts/${id}`, data, authHeader(token));
+  return response.data;
+};
+export const expertDeletePost = async (id, token) => {
+  const response = await API.delete(`/expert/posts/${id}`, authHeader(token));
+  return response.data;
+};
 // Manager expert management
 export const managerAddExpert = async (data, token) => {
   const response = await API.post("/manager/experts", data, authHeader(token));
@@ -149,16 +167,22 @@ export const managerDeleteExpert = async (expertId, token) => {
   return response.data;
 };
 
-// Manager categories
-export const managerCreateCategory = async (data, token) => {
-  const response = await API.post("/manager/categories", data, authHeader(token));
+// Public categories
+export const getCategories = async () => {
+  const response = await API.get("/categories");
   return response.data;
 };
-export const managerGetCategories = async (token) => {
-  const response = await API.get("/manager/categories", authHeader(token));
+
+// Admin categories (optional UI)
+export const adminCreateCategory = async (data, token) => {
+  const response = await API.post("/admin/categories", data, authHeader(token));
   return response.data;
 };
-export const managerDeleteCategory = async (id, token) => {
-  const response = await API.delete(`/manager/categories/${id}`, authHeader(token));
+export const adminGetCategories = async (token) => {
+  const response = await API.get("/admin/categories", authHeader(token));
+  return response.data;
+};
+export const adminDeleteCategory = async (id, token) => {
+  const response = await API.delete(`/admin/categories/${id}`, authHeader(token));
   return response.data;
 };

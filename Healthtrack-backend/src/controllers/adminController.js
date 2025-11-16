@@ -1,6 +1,7 @@
 import Manager from "../models/Manager.js";
 import User from "../models/User.js";
 import bcrypt from "bcryptjs";
+import Category from "../models/Category.js";
 
 export const createManager = async (req, res) => {
   try {
@@ -106,6 +107,39 @@ export const createAdminUser = async (req, res) => {
     });
 
     res.status(201).json({ _id: adminUser._id, name: adminUser.name, email: adminUser.email, role: adminUser.role });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// Admin categories
+export const adminCreateCategory = async (req, res) => {
+  try {
+    const { name } = req.body;
+    if (!name) return res.status(400).json({ message: "Name is required" });
+    const existing = await Category.findOne({ name });
+    if (existing) return res.status(400).json({ message: "Category already exists" });
+    const category = await Category.create({ name, createdBy: req.user.id });
+    res.status(201).json({ category });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+export const adminGetCategories = async (req, res) => {
+  try {
+    const categories = await Category.find().sort({ createdAt: -1 });
+    res.json({ categories });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+export const adminDeleteCategory = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await Category.deleteOne({ _id: id });
+    res.json({ message: "Category deleted" });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

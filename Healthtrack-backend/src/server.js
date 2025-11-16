@@ -7,6 +7,7 @@ import managerRoutes from "./routes/managerRoutes.js";
 import expertRoutes from "./routes/expertRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import advisoryRoutes from "./routes/advisory.js";
+import categoryRoutes from "./routes/categoryRoutes.js";
 import healthRoutes from "./routes/healthRoutes.js";
 import cors from "cors";
 import path from "path";
@@ -35,6 +36,7 @@ app.use("/api/manager", managerRoutes);
 app.use("/api/expert", expertRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/advisory", advisoryRoutes);
+app.use("/api/categories", categoryRoutes);
 
 // static uploads
 const __filename = fileURLToPath(import.meta.url);

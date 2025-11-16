@@ -4,12 +4,13 @@ import Category from "../models/Category.js";
 // Expert creates a post
 export const createPost = async (req, res) => {
   try {
-    const { title, content, categoryId } = req.body;
+    const { title, content, categoryId, imageUrl } = req.body;
 
     const post = new Post({
       title,
       content,
       category: categoryId || null,
+      imageUrl: imageUrl || null,
       createdBy: req.user.id,
     });
 
@@ -91,6 +92,46 @@ export const replyToComment = async (req, res) => {
     target.replies.push({ user: req.user.id, comment });
     await post.save();
     res.json({ comments: post.comments });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// Expert manage own posts
+export const myPosts = async (req, res) => {
+  try {
+    const posts = await Post.find({ createdBy: req.user.id })
+      .populate("category", "name")
+      .populate("comments.user", "name")
+      .sort({ createdAt: -1 });
+    res.json({ posts });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+export const updatePost = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { title, content, categoryId, imageUrl } = req.body;
+    const post = await Post.findOneAndUpdate(
+      { _id: id, createdBy: req.user.id },
+      { title, content, category: categoryId || null, imageUrl: imageUrl || null },
+      { new: true }
+    );
+    if (!post) return res.status(404).json({ message: "Post not found" });
+    res.json({ post });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+export const deletePost = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const deleted = await Post.findOneAndDelete({ _id: id, createdBy: req.user.id });
+    if (!deleted) return res.status(404).json({ message: "Post not found" });
+    res.json({ message: "Post deleted" });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

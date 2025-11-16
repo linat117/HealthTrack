@@ -9,9 +9,6 @@ import {
   managerMyPosts,
   managerUpdatePost,
   managerDeletePost,
-  managerCreateCategory,
-  managerGetCategories,
-  managerDeleteCategory,
 } from "../controllers/managerController.js";
 
 const router = express.Router();
@@ -57,24 +54,6 @@ router.delete(
   managerDeletePost
 );
 
-// Manager categories
-router.post(
-  "/categories",
-  authMiddleware,
-  roleMiddleware("manager"),
-  managerCreateCategory
-);
-router.get(
-  "/categories",
-  authMiddleware,
-  roleMiddleware("manager"),
-  managerGetCategories
-);
-router.delete(
-  "/categories/:id",
-  authMiddleware,
-  roleMiddleware("manager"),
-  managerDeleteCategory
-);
+// Category management moved to admin-only
 
 export default router;
