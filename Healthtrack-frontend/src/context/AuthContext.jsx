@@ -5,7 +5,14 @@ import { loginUser, registerUser } from "../api/api";
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(() => {
+    try {
+      const stored = localStorage.getItem("user");
+      return stored ? JSON.parse(stored) : null;
+    } catch {
+      return null;
+    }
+  });
   const [token, setToken] = useState(localStorage.getItem("token") || "");
 
   // Login function
@@ -14,7 +21,13 @@ export const AuthProvider = ({ children }) => {
     if (data.token) {
       setToken(data.token);
       localStorage.setItem("token", data.token);
-      setUser({ email: formData.email, role: data.role });
+      const nextUser = {
+        email: formData.email,
+        role: data.role,
+        name: data.name || formData.email,
+      };
+      setUser(nextUser);
+      localStorage.setItem("user", JSON.stringify(nextUser));
     }
     return data;
   };
@@ -30,11 +43,26 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
     setToken("");
     localStorage.removeItem("token");
+    localStorage.removeItem("user");
   };
 
   useEffect(() => {
-    // Optional: verify token / fetch user data on page load
-  }, []);
+    // Hydrate user from token if token exists but user is not stored
+    if (!user && token) {
+      try {
+        const payload = JSON.parse(atob(token.split(".")[1] || ""));
+        const nextUser = {
+          email: payload.email || "",
+          role: payload.role,
+          name: payload.name || "",
+        };
+        setUser(nextUser);
+        localStorage.setItem("user", JSON.stringify(nextUser));
+      } catch {
+        // ignore invalid token
+      }
+    }
+  }, [token, user]);
 
   return (
     <AuthContext.Provider value={{ user, token, login, register, logout }}>

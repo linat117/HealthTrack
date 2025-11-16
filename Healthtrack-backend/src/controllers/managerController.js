@@ -1,5 +1,6 @@
 import User from "../models/User.js";
 import bcrypt from "bcryptjs";
+import Post from "../models/Advisory.js";
 
 export const createExpert = async (req, res) => {
   try {
@@ -62,6 +63,58 @@ export const deleteExpert = async (req, res) => {
 
     await User.deleteOne({ _id: expertId, createdBy: req.user.id });
     res.json({ message: "Expert deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// Posts CRUD for manager
+export const managerCreatePost = async (req, res) => {
+  try {
+    const { title, content, categoryId } = req.body;
+    const post = await Post.create({
+      title,
+      content,
+      category: categoryId || null,
+      createdBy: req.user.id,
+    });
+    res.status(201).json({ post });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+export const managerMyPosts = async (req, res) => {
+  try {
+    const posts = await Post.find({ createdBy: req.user.id }).sort({ createdAt: -1 });
+    res.json({ posts });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+export const managerUpdatePost = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { title, content, categoryId } = req.body;
+    const post = await Post.findOneAndUpdate(
+      { _id: id, createdBy: req.user.id },
+      { title, content, category: categoryId || null },
+      { new: true }
+    );
+    if (!post) return res.status(404).json({ message: "Post not found" });
+    res.json({ post });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+export const managerDeletePost = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const deleted = await Post.findOneAndDelete({ _id: id, createdBy: req.user.id });
+    if (!deleted) return res.status(404).json({ message: "Post not found" });
+    res.json({ message: "Post deleted" });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

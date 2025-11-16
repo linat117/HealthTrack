@@ -2,19 +2,19 @@ import React from "react";
 
 const PostCard = ({ post }) => {
   return (
-    <div className="card mb-3" style={{ backgroundColor: "#FAF5F0" }}>
+    <div className="card mb-3 shadow-sm border-0">
       <div className="card-body">
-        <h5 className="card-title text-black">{post.title}</h5>
-        <p className="card-text text-dark">{post.content}</p>
-        <p className="card-text">
+        <h5 className="card-title">{post.title}</h5>
+        <p className="card-text">{post.content}</p>
+        <div className="d-flex justify-content-between align-items-center mt-3">
           <small className="text-muted">
-            Posted by {post.author} on{" "}
-            {new Date(post.date).toLocaleDateString()}
+            {post.author ? `By ${post.author}` : "Advisory"} ·{" "}
+            {post.date ? new Date(post.date).toLocaleDateString() : ""}
           </small>
-        </p>
-        <div>
-          <button className="btn btn-sm btn-primary me-2">Like</button>
-          <button className="btn btn-sm btn-secondary">Comment</button>
+          <div className="d-flex gap-2">
+            <button className="btn btn-sm btn-outline-primary">Like</button>
+            <button className="btn btn-sm btn-outline-secondary">Comment</button>
+          </div>
         </div>
       </div>
     </div>

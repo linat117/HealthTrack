@@ -3,7 +3,14 @@ import Advisory from "../models/Advisory.js"; // your model
 // Get all advisories/posts
 export const getAdvisories = async (req, res) => {
   try {
-    const advisories = await Advisory.find(); // fetch all
+    const filter = {};
+    if (req.query.createdBy) {
+      filter.createdBy = req.query.createdBy;
+    }
+    if (req.query.category) {
+      filter.category = req.query.category;
+    }
+    const advisories = await Advisory.find(filter).sort({ createdAt: -1 });
     res.status(200).json(advisories);
   } catch (error) {
     console.error(error);

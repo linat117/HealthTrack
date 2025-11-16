@@ -1,0 +1,68 @@
+:root {
+  --hl-bg: #f7f8fb;
+  --hl-card-bg: #ffffff;
+  --hl-primary: #3b82f6;
+  --hl-primary-dark: #2563eb;
+  --hl-text: #1f2937;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  background: var(--hl-bg);
+  color: var(--hl-text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Navbar styles */
+.navbar.bg-light {
+  background: linear-gradient(180deg, #ffffff, #f4f6fb) !important;
+}
+.admin-navbar {
+  background: linear-gradient(90deg, #111827, #1f2937) !important;
+}
+.navbar-brand {
+  letter-spacing: 0.2px;
+}
+
+/* Card polish */
+.card {
+  background: var(--hl-card-bg);
+  border-radius: 12px;
+  border: 1px solid rgba(0,0,0,0.05);
+}
+.card.shadow-sm {
+  box-shadow: 0 6px 20px rgba(0,0,0,0.06) !important;
+}
+
+/* Buttons */
+.btn-primary {
+  background: linear-gradient(180deg, var(--hl-primary), var(--hl-primary-dark));
+  border: none;
+}
+.btn-primary:hover {
+  filter: brightness(0.98);
+}
+.btn-outline-primary {
+  border-color: var(--hl-primary);
+  color: var(--hl-primary);
+}
+.btn-outline-primary:hover {
+  background: var(--hl-primary);
+  color: #fff;
+}
+
+/* Tables */
+.table > :not(caption) > * > * {
+  padding: 0.9rem 0.75rem;
+}
+
+/* Utility spacing tweaks */
+.container {
+  max-width: 1100px;
+}
+
+

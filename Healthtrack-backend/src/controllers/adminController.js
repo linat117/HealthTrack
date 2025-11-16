@@ -1,32 +1,111 @@
+import Manager from "../models/Manager.js";
 import User from "../models/User.js";
 import bcrypt from "bcryptjs";
 
-export const createUser = async (req, res) => {
+export const createManager = async (req, res) => {
   try {
-    const { name, email, role, tempPassword } = req.body;
+    const { name, email, phone, password } = req.body;
 
-    if (!name || !email || !role || !tempPassword) {
-      return res.status(400).json({ message: "All fields are required" });
+    const existing = await Manager.findOne({ email });
+    if (existing) {
+      return res.status(400).json({ message: "Manager already exists" });
     }
 
-    const existingUser = await User.findOne({ email });
-    if (existingUser)
-      return res.status(400).json({ message: "User already exists" });
+    const userExists = await User.findOne({ email });
+    if (userExists) {
+      return res.status(400).json({ message: "User with email already exists" });
+    }
 
-    const hashedPassword = await bcrypt.hash(tempPassword, 10);
-
-    const newUser = new User({
+    const hashed = await bcrypt.hash(password, 10);
+    const user = await User.create({
       name,
       email,
-      role,
-      password: hashedPassword,
-      mustChangePassword: true, // optional flag
-      createdBy: req.user.id,
+      password: hashed,
+      role: "manager",
+      createdBy: req.user.id
     });
 
-    await newUser.save();
+    const manager = await Manager.create({
+      name,
+      email,
+      phone,
+      role: "manager",
+      user: user._id,
+      createdBy: req.user.id
+    });
 
-    res.status(201).json({ user: newUser });
+    res.status(201).json(manager);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+export const getManagers = async (req, res) => {
+  try {
+    const managers = await Manager.find().sort({ createdAt: -1 });
+    res.json(managers);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+export const getManager = async (req, res) => {
+  try {
+    const manager = await Manager.findById(req.params.id);
+    if (!manager) {
+      return res.status(404).json({ message: "Manager not found" });
+    }
+    res.json(manager);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+export const updateManager = async (req, res) => {
+  try {
+    const { name, email, phone } = req.body;
+    const manager = await Manager.findByIdAndUpdate(
+      req.params.id,
+      { name, email, phone },
+      { new: true }
+    );
+    if (!manager) {
+      return res.status(404).json({ message: "Manager not found" });
+    }
+    res.json(manager);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+export const deleteManager = async (req, res) => {
+  try {
+    await Manager.findByIdAndDelete(req.params.id);
+    res.json({ message: "Manager deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+export const createAdminUser = async (req, res) => {
+  try {
+    const { name, email, password } = req.body;
+
+    const existing = await User.findOne({ email });
+    if (existing) {
+      return res.status(400).json({ message: "User already exists" });
+    }
+
+    const hashed = await bcrypt.hash(password, 10);
+    const adminUser = await User.create({
+      name,
+      email,
+      password: hashed,
+      role: "admin",
+      createdBy: req.user.id
+    });
+
+    res.status(201).json({ _id: adminUser._id, name: adminUser.name, email: adminUser.email, role: adminUser.role });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

@@ -5,6 +5,10 @@ import {
   createExpert,
   getExperts,
   deleteExpert,
+  managerCreatePost,
+  managerMyPosts,
+  managerUpdatePost,
+  managerDeletePost,
 } from "../controllers/managerController.js";
 
 const router = express.Router();
@@ -22,6 +26,32 @@ router.delete(
   authMiddleware,
   roleMiddleware("manager"),
   deleteExpert
+);
+
+// Manager posts CRUD
+router.post(
+  "/posts",
+  authMiddleware,
+  roleMiddleware("manager"),
+  managerCreatePost
+);
+router.get(
+  "/posts/mine",
+  authMiddleware,
+  roleMiddleware("manager"),
+  managerMyPosts
+);
+router.put(
+  "/posts/:id",
+  authMiddleware,
+  roleMiddleware("manager"),
+  managerUpdatePost
+);
+router.delete(
+  "/posts/:id",
+  authMiddleware,
+  roleMiddleware("manager"),
+  managerDeletePost
 );
 
 export default router;

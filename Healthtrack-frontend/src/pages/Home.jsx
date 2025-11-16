@@ -1,21 +1,19 @@
 import React, { useEffect, useState } from "react";
 import PostCard from "../components/PostCard.jsx";
-import axios from "axios";
+import { getAdvisories } from "../api/api.js";
 
 const Home = () => {
   const [posts, setPosts] = useState([]);
 
   useEffect(() => {
-    // Fetch posts from backend
     const fetchPosts = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/advisory");
-        setPosts(res.data);
+        const data = await getAdvisories();
+        setPosts(data);
       } catch (err) {
         console.error("Error fetching posts:", err);
       }
     };
-
     fetchPosts();
   }, []);
 

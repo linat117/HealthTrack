@@ -48,9 +48,26 @@ export const loginUser = async (req, res) => {
       { expiresIn: "1d" }
     );
 
-    res.json({ message: "Login successful", token });
+    res.json({ message: "Login successful", token, role: user.role, name: user.name });
   } catch (error) {
     console.error(error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+export const changePassword = async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    const user = await User.findById(req.user.id).select("+password");
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    const ok = await bcrypt.compare(currentPassword, user.password || "");
+    if (!ok) return res.status(400).json({ message: "Current password is incorrect" });
+
+    user.password = await bcrypt.hash(newPassword, 10);
+    await user.save();
+    res.json({ message: "Password updated successfully" });
+  } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
