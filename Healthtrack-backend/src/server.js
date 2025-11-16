@@ -12,7 +12,7 @@ import healthRoutes from "./routes/healthRoutes.js";
 import cors from "cors";
 import path from "path";
 import { fileURLToPath } from "url";
-import { upload } from "./utils/upload.js";
+import { upload, uploadMemory, uploadToCloudinary } from "./utils/upload.js";
 dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -22,7 +22,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(
   cors({
-    origin: "http://localhost:5173", // your React dev server
+    origin: process.env.FRONTEND_ORIGIN || "http://localhost:5173",
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   })
@@ -44,12 +44,26 @@ const __dirname = path.dirname(__filename);
 app.use("/uploads", express.static(path.join(__dirname, "..", "uploads")));
 
 // upload endpoint (auth handled at route-level if needed)
-app.post("/api/manager/upload", upload.single("image"), (req, res) => {
-  const filename = req.file?.filename;
-  if (!filename) return res.status(400).json({ message: "No file uploaded" });
-  const url = `/uploads/${filename}`;
-  res.json({ url });
-});
+// If CLOUDINARY_URL is set, upload to cloudinary; else use local disk
+if (process.env.CLOUDINARY_URL) {
+  app.post("/api/manager/upload", uploadMemory.single("image"), async (req, res) => {
+    try {
+      if (!req.file) return res.status(400).json({ message: "No file uploaded" });
+      const result = await uploadToCloudinary(req.file.buffer);
+      return res.json({ url: result.secure_url });
+    } catch (e) {
+      console.error(e);
+      return res.status(500).json({ message: "Upload failed" });
+    }
+  });
+} else {
+  app.post("/api/manager/upload", upload.single("image"), (req, res) => {
+    const filename = req.file?.filename;
+    if (!filename) return res.status(400).json({ message: "No file uploaded" });
+    const url = `/uploads/${filename}`;
+    res.json({ url });
+  });
+}
 // connect db
 connectDB();
 

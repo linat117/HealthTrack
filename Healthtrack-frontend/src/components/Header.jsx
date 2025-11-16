@@ -1,6 +1,7 @@
 import React, { useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext.jsx";
+import logo from "../assets/download.png";
 
 const Header = () => {
   const { user, logout } = useContext(AuthContext);
@@ -14,8 +15,8 @@ const Header = () => {
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-light shadow-sm sticky-top">
       <div className="container">
-        <Link className="navbar-brand fw-bold" to="/">
-          HealthLink
+        <Link className="navbar-brand fw-bold d-flex align-items-center gap-2" to="/">
+          <img src={logo} alt="TenaLink" style={{ height: 32, filter: "drop-shadow(0 1px 1px rgba(0,0,0,0.2))" }} />
         </Link>
         <button
           className="navbar-toggler"
