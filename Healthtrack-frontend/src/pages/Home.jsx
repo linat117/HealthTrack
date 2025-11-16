@@ -38,16 +38,24 @@ const Home = () => {
   return (
     <div>
       {/* Hero */}
-      <div className="p-4 p-md-5 mb-4 rounded-3" style={{ background: "linear-gradient(135deg,#e8f0ff,#fff)" }}>
-        <div className="container py-3">
-          <h1 className="display-6 fw-semibold mb-2">Community Health Advisories</h1>
-          <p className="lead text-muted mb-3">
+      <div className="p-3 p-md-5 mb-4 rounded-3" style={{ background: "linear-gradient(135deg,#e8f0ff,#fff)" }}>
+        <div className="container py-2 py-md-3">
+          <h1
+            className="fw-semibold mb-2"
+            style={{ fontSize: "clamp(1.25rem, 2.2vw + 0.6rem, 2rem)" }}
+          >
+            Community Health Advisories
+          </h1>
+          <p
+            className="text-muted mb-3"
+            style={{ fontSize: "clamp(0.9rem, 1.2vw + 0.6rem, 1.1rem)" }}
+          >
             Stay informed on outbreaks, vaccination campaigns, and health tips in your community.
           </p>
-          <div className="row g-2">
+          <div className="row g-2 g-md-3">
             <div className="col-12 col-md-6">
               <input
-                className="form-control form-control-lg"
+                className="form-control"
                 placeholder="Search advisories..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
@@ -63,7 +71,7 @@ const Home = () => {
             </div>
             <div className="col-12 col-md-4">
               <select
-                className="form-select form-select-lg"
+                className="form-select"
                 value={selectedCategory}
                 onChange={(e) => {
                   const val = e.target.value;
@@ -83,7 +91,7 @@ const Home = () => {
             </div>
             <div className="col-12 col-md-2 d-grid">
               <button
-                className="btn btn-primary btn-lg"
+                className="btn btn-primary"
                 onClick={() => {
                   const params = {};
                   if (selectedCategory) params.category = selectedCategory;

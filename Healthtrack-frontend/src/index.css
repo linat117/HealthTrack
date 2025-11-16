@@ -38,6 +38,41 @@ body {
   box-shadow: 0 6px 20px rgba(0,0,0,0.06) !important;
 }
 
+/* Home polish */
+.post-card {
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  border-radius: 14px;
+}
+.post-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 26px rgba(0,0,0,0.08) !important;
+}
+.badge.text-bg-light.border {
+  background: #f8fafc !important;
+  border-color: #e5e7eb !important;
+}
+.placeholder-glow .placeholder {
+  display: inline-block;
+  height: 0.8rem;
+  background-color: #eef2ff;
+  border-radius: 4px;
+}
+
+/* Modal tweaks for lighter backdrop and better readability */
+.modal-backdrop.show {
+  opacity: 0.25;
+}
+.modal-content {
+  border-radius: 12px;
+  border: 1px solid rgba(0,0,0,0.06);
+}
+.modal-header {
+  border-bottom-color: rgba(0,0,0,0.06);
+}
+.modal-footer {
+  border-top-color: rgba(0,0,0,0.06);
+}
+
 /* Buttons */
 .btn-primary {
   background: linear-gradient(180deg, var(--hl-primary), var(--hl-primary-dark));

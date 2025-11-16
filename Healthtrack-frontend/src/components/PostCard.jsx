@@ -1,10 +1,11 @@
-import React, { useContext, useMemo, useState } from "react";
+import React, { useContext, useEffect, useMemo, useState } from "react";
 import { AuthContext } from "../context/AuthContext.jsx";
 import { reactToPost, commentOnPost, replyToComment } from "../api/api.js";
 
 const PostCard = ({ post, onUpdated }) => {
   const { token } = useContext(AuthContext);
   const [comment, setComment] = useState("");
+  const [showComments, setShowComments] = useState(false);
   const resolveImageUrl = (url) => {
     if (!url) return "";
     if (/^https?:\/\//i.test(url)) return url;
@@ -36,8 +37,19 @@ const PostCard = ({ post, onUpdated }) => {
     onUpdated && onUpdated();
   };
 
+  // Prevent background page from scrolling while modal is open
+  useEffect(() => {
+    if (showComments) {
+      const previous = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+      return () => {
+        document.body.style.overflow = previous || "";
+      };
+    }
+  }, [showComments]);
+
   return (
-    <div className="card mb-3 shadow-sm border-0">
+    <div className="card mb-3 shadow-sm border-0 post-card">
       {post.imageUrl && (
         <img
           src={resolveImageUrl(post.imageUrl)}
@@ -56,39 +68,30 @@ const PostCard = ({ post, onUpdated }) => {
         <p className="card-text text-muted mb-2" style={{ whiteSpace: "pre-line" }}>
           {post.content?.length > 220 ? `${post.content.slice(0, 220)}...` : post.content}
         </p>
-        <div className="d-flex flex-wrap gap-3 small text-muted">
-          <span>
-            Reactions: {counts.total} (👍 {counts.like} · ❤️ {counts.love} · 😄 {counts.haha} · 😢 {counts.sad})
-          </span>
+        <div className="d-flex flex-wrap align-items-center gap-3 small text-muted p-2 border rounded-3">
+          <span>👍 {counts.like}</span>
+          <span>❤️ {counts.love}</span>
+          <span>😄 {counts.haha}</span>
+          <span>😢 {counts.sad}</span>
           <button
             type="button"
-            className="btn btn-link p-0 align-baseline"
-            data-bs-toggle="modal"
-            data-bs-target={`#reactions-${post._id}`}
+            className="btn btn-sm btn-outline-secondary rounded-pill px-3"
+            onClick={() => setShowComments(true)}
           >
-            View reactions
-          </button>
-          <span>Comments: {counts.comments}</span>
-          <button
-            type="button"
-            className="btn btn-link p-0 align-baseline"
-            data-bs-toggle="modal"
-            data-bs-target={`#comments-${post._id}`}
-          >
-            View comments
+            View comments ({counts.comments})
           </button>
         </div>
         <div className="d-flex justify-content-between align-items-center mt-3">
           <small className="text-muted">
-            {post.author ? `By ${post.author}` : "Advisory"} ·{" "}
+            {post.author ? `By ${post.author} · ` : ""}
             {post.date ? new Date(post.date).toLocaleDateString() : ""}
           </small>
           <div className="d-flex flex-wrap gap-2">
             <div className="btn-group btn-group-sm" role="group">
-              <button className="btn btn-outline-primary" onClick={() => doReact("like")}>👍 Like</button>
-              <button className="btn btn-outline-primary" onClick={() => doReact("love")}>❤️ Love</button>
-              <button className="btn btn-outline-primary" onClick={() => doReact("haha")}>😄 Haha</button>
-              <button className="btn btn-outline-primary" onClick={() => doReact("sad")}>😢 Sad</button>
+              <button className="btn btn-outline-primary" onClick={() => doReact("like")}>👍</button>
+              <button className="btn btn-outline-primary" onClick={() => doReact("love")}>❤️</button>
+              <button className="btn btn-outline-primary" onClick={() => doReact("haha")}>😄</button>
+              <button className="btn btn-outline-primary" onClick={() => doReact("sad")}>😢</button>
             </div>
           </div>
         </div>
@@ -105,7 +108,7 @@ const PostCard = ({ post, onUpdated }) => {
         </div>
       </div>
 
-      {/* Reactions Modal */}
+      {/* Reactions Modal (Bootstrap) */}
       <div className="modal fade" id={`reactions-${post._id}`} tabIndex="-1" aria-hidden="true">
         <div className="modal-dialog">
           <div className="modal-content">
@@ -125,73 +128,105 @@ const PostCard = ({ post, onUpdated }) => {
         </div>
       </div>
 
-      {/* Comments Modal */}
-      <div className="modal fade" id={`comments-${post._id}`} tabIndex="-1" aria-hidden="true">
-        <div className="modal-dialog modal-lg">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h5 className="modal-title">Comments</h5>
-              <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div className="modal-body">
-              {(post.comments || []).length === 0 ? (
-                <div className="text-muted">No comments yet.</div>
-              ) : (
-                <ul className="list-group">
-                  {(post.comments || []).map((c, idx) => (
-                    <li key={idx} className="list-group-item">
-                      <div className="fw-semibold">{c.user?.name || "User"}</div>
-                      <div>{c.comment}</div>
-                      <small className="text-muted">{c.createdAt ? new Date(c.createdAt).toLocaleString() : ""}</small>
-                      {/* Replies */}
-                      {(c.replies || []).length > 0 && (
-                        <ul className="list-group list-group-flush mt-2">
-                          {c.replies.map((r, ridx) => (
-                            <li key={ridx} className="list-group-item">
-                              <div className="fw-semibold">{r.user?.name || "User"}</div>
-                              <div>{r.comment}</div>
-                              <small className="text-muted">{r.createdAt ? new Date(r.createdAt).toLocaleString() : ""}</small>
-                            </li>
-                          ))}
-                        </ul>
-                      )}
-                      {/* Reply box */}
-                      {token && (
-                        <div className="d-flex gap-2 mt-2">
-                          <input
-                            className="form-control form-control-sm"
-                            placeholder="Reply..."
-                            onKeyDown={async (e) => {
-                              if (e.key === "Enter" && e.currentTarget.value.trim()) {
-                                await replyToComment(post._id, c._id, e.currentTarget.value.trim(), token);
-                                e.currentTarget.value = "";
-                                onUpdated && onUpdated();
-                              }
-                            }}
-                          />
-                          <button
-                            className="btn btn-sm btn-outline-secondary"
-                            onClick={async (e) => {
-                              const input = e.currentTarget.previousSibling;
-                              const val = input.value.trim();
-                              if (!val) return;
-                              await replyToComment(post._id, c._id, val, token);
-                              input.value = "";
-                              onUpdated && onUpdated();
-                            }}
-                          >
-                            Reply
-                          </button>
-                        </div>
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              )}
+      {/* Comments Modal (Custom lightweight, centered) */}
+      {showComments && (
+        <>
+          <div
+            className="position-fixed top-0 start-0 w-100 h-100"
+            style={{
+              background: "rgba(0,0,0,0.25)",
+              backdropFilter: "blur(4px)",
+              WebkitBackdropFilter: "blur(4px)",
+              zIndex: 1050,
+            }}
+            onClick={() => setShowComments(false)}
+          />
+          <div
+            className="position-fixed top-0 start-50 translate-middle-x"
+            style={{ zIndex: 1060, width: "min(96vw, 800px)", marginTop: "1rem" }}
+            role="dialog"
+            aria-modal="true"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="card shadow">
+              <div className="card-header d-flex justify-content-between align-items-center">
+                <h5 className="mb-0">Comments</h5>
+                <button className="btn btn-sm btn-outline-secondary" onClick={() => setShowComments(false)}>Close</button>
+              </div>
+              <div className="card-body" style={{ maxHeight: "70vh", overflowY: "auto" }}>
+                {(post.comments || []).length === 0 ? (
+                  <div className="text-muted">No comments yet.</div>
+                ) : (
+                  <ul className="list-group list-group-flush">
+                    {(post.comments || []).map((c, idx) => {
+                      const isAuthor =
+                        (typeof post.createdBy === "string" && c.user?._id === post.createdBy) ||
+                        (post.createdBy && typeof post.createdBy === "object" && c.user?._id === post.createdBy._id);
+                      const displayName = isAuthor ? "Author" : (c.user?.name || "User");
+                      return (
+                        <li key={idx} className="list-group-item">
+                          <div className="d-flex justify-content-between">
+                            <div className="fw-semibold">{displayName}</div>
+                            <small className="text-muted">{c.createdAt ? new Date(c.createdAt).toLocaleString() : ""}</small>
+                          </div>
+                          <div className="mt-1">{c.comment}</div>
+                          {(c.replies || []).length > 0 && (
+                            <ul className="list-group list-group-flush mt-2">
+                              {c.replies.map((r, ridx) => {
+                                const replyIsAuthor =
+                                  (typeof post.createdBy === "string" && r.user?._id === post.createdBy) ||
+                                  (post.createdBy && typeof post.createdBy === "object" && r.user?._id === post.createdBy._id);
+                                const replyName = replyIsAuthor ? "Author" : (r.user?.name || "User");
+                                return (
+                                  <li key={ridx} className="list-group-item ps-4">
+                                    <div className="d-flex justify-content-between">
+                                      <div className="fw-semibold">{replyName}</div>
+                                      <small className="text-muted">{r.createdAt ? new Date(r.createdAt).toLocaleString() : ""}</small>
+                                    </div>
+                                    <div className="mt-1">{r.comment}</div>
+                                  </li>
+                                );
+                              })}
+                            </ul>
+                          )}
+                          {token && (
+                            <div className="d-flex gap-2 mt-2">
+                              <input
+                                className="form-control form-control-sm"
+                                placeholder="Reply..."
+                                onKeyDown={async (e) => {
+                                  if (e.key === "Enter" && e.currentTarget.value.trim()) {
+                                    await replyToComment(post._id, c._id, e.currentTarget.value.trim(), token);
+                                    e.currentTarget.value = "";
+                                    onUpdated && onUpdated();
+                                  }
+                                }}
+                              />
+                              <button
+                                className="btn btn-sm btn-outline-secondary"
+                                onClick={async (e) => {
+                                  const input = e.currentTarget.previousSibling;
+                                  const val = input.value.trim();
+                                  if (!val) return;
+                                  await replyToComment(post._id, c._id, val, token);
+                                  input.value = "";
+                                  onUpdated && onUpdated();
+                                }}
+                              >
+                                Reply
+                              </button>
+                            </div>
+                          )}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                )}
+              </div>
             </div>
           </div>
-        </div>
-      </div>
+        </>
+      )}
     </div>
   );
 };
