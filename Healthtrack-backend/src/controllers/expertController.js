@@ -77,3 +77,21 @@ export const commentOnPost = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
+// Reply to a comment
+export const replyToComment = async (req, res) => {
+  try {
+    const { postId, commentId } = req.params;
+    const { comment } = req.body;
+    const post = await Post.findById(postId);
+    if (!post) return res.status(404).json({ message: "Post not found" });
+    const target = post.comments.id(commentId);
+    if (!target) return res.status(404).json({ message: "Comment not found" });
+    if (!target.replies) target.replies = [];
+    target.replies.push({ user: req.user.id, comment });
+    await post.save();
+    res.json({ comments: post.comments });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};

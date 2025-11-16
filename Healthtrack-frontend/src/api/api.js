@@ -110,6 +110,17 @@ export const managerDeletePost = async (id, token) => {
   return response.data;
 };
 
+export const managerUploadImage = async (file, token) => {
+  const form = new FormData();
+  form.append("image", file);
+  const response = await API.post("/manager/upload", form, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "multipart/form-data",
+    },
+  });
+  return response.data;
+};
 // Reactions and comments (shared)
 export const reactToPost = async (postId, type, token) => {
   const response = await API.post(`/expert/posts/${postId}/react`, { type }, authHeader(token));
@@ -120,6 +131,10 @@ export const commentOnPost = async (postId, comment, token) => {
   return response.data;
 };
 
+export const replyToComment = async (postId, commentId, comment, token) => {
+  const response = await API.post(`/expert/posts/${postId}/comments/${commentId}/reply`, { comment }, authHeader(token));
+  return response.data;
+};
 // Manager expert management
 export const managerAddExpert = async (data, token) => {
   const response = await API.post("/manager/experts", data, authHeader(token));
@@ -131,5 +146,19 @@ export const managerGetExperts = async (token) => {
 };
 export const managerDeleteExpert = async (expertId, token) => {
   const response = await API.delete(`/manager/experts/${expertId}`, authHeader(token));
+  return response.data;
+};
+
+// Manager categories
+export const managerCreateCategory = async (data, token) => {
+  const response = await API.post("/manager/categories", data, authHeader(token));
+  return response.data;
+};
+export const managerGetCategories = async (token) => {
+  const response = await API.get("/manager/categories", authHeader(token));
+  return response.data;
+};
+export const managerDeleteCategory = async (id, token) => {
+  const response = await API.delete(`/manager/categories/${id}`, authHeader(token));
   return response.data;
 };

@@ -53,6 +53,16 @@ const ManagerHeader = () => {
                 Manage Experts
               </Link>
             </li>
+            <li className="nav-item">
+              <Link className="nav-link" to="/manager/categories/add">
+                Add Category
+              </Link>
+            </li>
+            <li className="nav-item">
+              <Link className="nav-link" to="/manager/categories">
+                Manage Categories
+              </Link>
+            </li>
             {user && (
               <li className="nav-item">
                 <button className="btn btn-outline-light ms-lg-2 mt-2 mt-lg-0" onClick={handleLogout}>

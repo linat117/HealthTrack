@@ -9,6 +9,9 @@ import userRoutes from "./routes/userRoutes.js";
 import advisoryRoutes from "./routes/advisory.js";
 import healthRoutes from "./routes/healthRoutes.js";
 import cors from "cors";
+import path from "path";
+import { fileURLToPath } from "url";
+import { upload } from "./utils/upload.js";
 dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -32,6 +35,19 @@ app.use("/api/manager", managerRoutes);
 app.use("/api/expert", expertRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/advisory", advisoryRoutes);
+
+// static uploads
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+app.use("/uploads", express.static(path.join(__dirname, "..", "uploads")));
+
+// upload endpoint (auth handled at route-level if needed)
+app.post("/api/manager/upload", upload.single("image"), (req, res) => {
+  const filename = req.file?.filename;
+  if (!filename) return res.status(400).json({ message: "No file uploaded" });
+  const url = `/uploads/${filename}`;
+  res.json({ url });
+});
 // connect db
 connectDB();
 

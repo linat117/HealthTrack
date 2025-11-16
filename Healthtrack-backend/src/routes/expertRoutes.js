@@ -6,6 +6,7 @@ import {
   getPosts,
   reactToPost,
   commentOnPost,
+  replyToComment,
 } from "../controllers/expertController.js";
 
 const router = express.Router();
@@ -17,5 +18,6 @@ router.get("/posts", authMiddleware, getPosts);
 // User interactions
 router.post("/posts/:postId/react", authMiddleware, reactToPost);
 router.post("/posts/:postId/comment", authMiddleware, commentOnPost);
+router.post("/posts/:postId/comments/:commentId/reply", authMiddleware, replyToComment);
 
 export default router;

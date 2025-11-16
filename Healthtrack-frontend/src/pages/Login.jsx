@@ -16,9 +16,13 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await login(formData);
+      const data = await login(formData);
       console.log("user logged in successfully!");
-      navigate("/dashboard");
+      if (data?.mustChangePassword) {
+        navigate("/change-password");
+      } else {
+        navigate("/dashboard");
+      }
     } catch (err) {
       setError("Invalid credentials. Please try again.");
     }

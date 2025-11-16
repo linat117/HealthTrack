@@ -20,6 +20,8 @@ import ManagerAddPost from "./pages/Manager/ManagerAddPost.jsx";
 import ManagerMyPosts from "./pages/Manager/ManagerPosts.jsx";
 import ManagerAddExpert from "./pages/Manager/ManagerAddExpert.jsx";
 import ManagerExperts from "./pages/Manager/ManagerExperts.jsx";
+import ManagerAddCategory from "./pages/Manager/ManagerAddCategory.jsx";
+import ManagerCategories from "./pages/Manager/ManagerCategories.jsx";
 import { AuthContext } from "./context/AuthContext.jsx";
 import ChangePassword from "./pages/ChangePassword.jsx";
 
@@ -137,6 +139,22 @@ const AppShell = () => {
             element={
               <PrivateRoute>
                 <ManagerExperts />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/manager/categories/add"
+            element={
+              <PrivateRoute>
+                <ManagerAddCategory />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/manager/categories"
+            element={
+              <PrivateRoute>
+                <ManagerCategories />
               </PrivateRoute>
             }
           />
